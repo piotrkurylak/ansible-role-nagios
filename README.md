@@ -1,4 +1,4 @@
-## Role Name: Docker
+## Role Name: Nagios
 
 Ansible role which allows you to install Nagios on Debian systems.
 
