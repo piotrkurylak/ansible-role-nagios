@@ -1,0 +1,11 @@
+---
+nagios_version: 4.4.6
+nagios_plugins_version: 2.3.3
+nagios_prerequisites: [autoconf, gcc, libc6, make, wget, unzip, apache2, apache2-utils, php, libgd-dev, libmcrypt-dev, libssl-dev, bc, gawk, dc, build-essential, snmp, libnet-snmp-perl, gettext]                     
+nagios_download_url: "https://github.com/NagiosEnterprises/nagioscore/archive/nagios-{{ nagios_version }}.tar.gz"
+nagios_download_path: "/tmp/nagioscore-nagios-{{ nagios_version }}"
+nagios_plugins_download_path: "/tmp/nagios-plugins-release-{{ nagios_plugins_version }}"
+nagios_plugins_download_url: "https://github.com/nagios-plugins/nagios-plugins/archive/release-{{ nagios_plugins_version }}.tar.gz" 
+## Please change this if you want. I did not use ansible vault because of demonstration purposes.
+nagios_username: nagiosadmin
+nagios_password: nagios

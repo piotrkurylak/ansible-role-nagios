@@ -1,0 +1,31 @@
+
+- name: Download Nagios Plugins.
+  get_url:
+    url: "{{ nagios_plugins_download_url }}"
+    dest: "{{ nagios_plugins_download_path }}.tar.gz"
+
+- name: Extract Nagios Plugins.
+  unarchive:
+    copy: no
+    src: "{{ nagios_plugins_download_path }}.tar.gz"
+    dest: "/tmp"
+
+- name: Configure Nagios Plugins source.
+  command: "./tools/setup"
+  args:
+    chdir: "{{ nagios_plugins_download_path }}"
+  
+- name: Ensure that Nagios plugins source is configured.
+  command: "./configure"
+  args:
+    chdir: "{{ nagios_plugins_download_path }}"
+
+- name: Ensure that Nagios plugins source is compiled.
+  command: "make"
+  args:
+    chdir: "{{ nagios_plugins_download_path }}"  
+
+- name: Ensure that Nagios plugins source is installed.
+  command: "make install"
+  args:
+    chdir: "{{ nagios_plugins_download_path }}"  

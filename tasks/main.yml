@@ -1,0 +1,82 @@
+---
+
+- include_tasks: setup-Debian.yml
+  when: ansible_os_family == 'Debian'
+
+- name: Download Nagios Core.
+  get_url:
+    url: "{{ nagios_download_url }}"
+    dest: "{{ nagios_download_path }}.tar.gz"
+
+- name: Extract Nagios archive.
+  unarchive:
+    copy: no
+    src: "{{ nagios_download_path }}.tar.gz"
+    dest: "/tmp"
+
+- name: Configure Nagios source.
+  command: "./configure --with-httpd-conf=/etc/apache2/sites-enabled"
+  args:
+    chdir: "{{ nagios_download_path }}"
+  
+- name: Ensure that Nagios source is compiled.
+  command: "make all"
+  args:
+    chdir: "{{ nagios_download_path }}"
+
+- name: Ensure that nagios user and group are created.
+  command: "make install-groups-users"
+  args:
+    chdir: "{{ nagios_download_path }}"
+  
+- name: Append www-data user to nagios group also.
+  user:
+    name: www-data
+    groups: nagios
+    append: yes
+
+- name: Ensure that binary, CGIs, HTML files are installed.
+  command: "make install"
+  args:
+    chdir: "{{ nagios_download_path }}"
+
+- name: Ensure that service/daemon files are installed and configured.
+  command: "make install-daemoninit"
+  args:
+    chdir: "{{ nagios_download_path }}"
+
+- name: Install and configures external command file.
+  command: "make install-commandmode"
+  args:
+    chdir: "{{ nagios_download_path }}" 
+
+- name: Install sample nagios configuration files. 
+  command: "make install-config"
+  args:
+    chdir: "{{ nagios_download_path }}" 
+
+- name: Install Apache web server config files.
+  shell: "make install-webconf && a2enmod rewrite && a2enmod cgi"
+  args:
+    chdir: "{{ nagios_download_path }}" 
+
+
+## Be careful with flag -c, it will override the existing user.
+- name: Create nagiosadmin user account for web GUI.
+  command: "htpasswd -bc /usr/local/nagios/etc/htpasswd.users {{ nagios_username }} {{ nagios_password }}"
+  args:
+    chdir: "{{ nagios_download_path }}" 
+
+- name: Ensure that Apache is restarted and enabled at boot.
+  service:
+    name: apache2
+    state: restarted
+    enabled: yes
+
+- name: Ensure that Nagios is restarted and enabled at boot.
+  service:
+    name: nagios
+    state: restarted
+    enabled: yes
+
+- include_tasks: nagios-plugins.yml
