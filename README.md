@@ -59,7 +59,7 @@ None.
     - hosts: all
       become: yes
       roles:
-         - nagios
+         - ansible-role-nagios
 ````
 
 ## License
